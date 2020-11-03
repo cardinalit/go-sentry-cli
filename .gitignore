@@ -13,3 +13,11 @@
 
 # Dependency directories (remove the comment below to include it)
 # vendor/
+
+# Build binary
+bin/
+
+# OS & IDEA
+.DS_Store
+.AppleDouble
+.idea
