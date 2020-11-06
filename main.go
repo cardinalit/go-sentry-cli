@@ -26,9 +26,12 @@ var (
 func getOrganization(sentryClient *sentry.Client, orgSLug string) (bool, *sentry.Organization) {
 	InfoLogger.Printf("Checking the organization <%s> for existence", orgSLug)
 
-	if org, err := sentryClient.GetOrganization(orgSLug); err == nil {
+	org, err := sentryClient.GetOrganization(orgSLug)
+	if err == nil {
 		return true, &org
 	}
+
+	ErrorLogger.Println("Get organization info failed: ", err)
 
 	return false, nil
 }
@@ -38,9 +41,12 @@ func getOrganization(sentryClient *sentry.Client, orgSLug string) (bool, *sentry
 func createOrganization(sentryClient *sentry.Client, orgSlug string) (bool, *sentry.Organization) {
 	InfoLogger.Printf("Creating a non-existent organization <%s>", orgSlug)
 
-	if org, err := sentryClient.CreateOrganization(orgSlug); err == nil {
+	org, err := sentryClient.CreateOrganization(orgSlug)
+	if err == nil {
 		return true, &org
 	}
+
+	ErrorLogger.Printf("Creating organization <%s> failed: %s", orgSlug, err)
 
 	return false, nil
 }
@@ -48,9 +54,12 @@ func createOrganization(sentryClient *sentry.Client, orgSlug string) (bool, *sen
 func getProject(sentryClient *sentry.Client, org *sentry.Organization, projSlug string) (bool, *sentry.Project) {
 	InfoLogger.Printf("Checking the existence of the project <%s> in the organization <%s> (id: %d)", projSlug, org.Name, org.ID)
 
-	if proj, err := sentryClient.GetProject(*org, projSlug); err == nil {
+	proj, err := sentryClient.GetProject(*org, projSlug)
+	if err == nil {
 		return true, &proj
 	}
+
+	ErrorLogger.Printf("Get <%s> project info from organization <%s> failed: %s", projSlug, *org.Slug, err)
 
 	return false, nil
 }
@@ -63,9 +72,12 @@ func createProject(sentryClient *sentry.Client, org *sentry.Organization, projSl
 		Name:        org.Name,
 	}
 
-	if proj, err := sentryClient.CreateProject(*org, team, projSlug, &projSlug); err == nil {
+	proj, err := sentryClient.CreateProject(*org, team, projSlug, &projSlug)
+	if err == nil {
 		return true, &proj
 	}
+
+	ErrorLogger.Printf("Create <%s> project in organization <%s> failed: %s", projSlug, *org.Slug, err)
 
 	return false, nil
 }
